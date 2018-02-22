@@ -107,7 +107,9 @@
 
 #define	HUB_STATUS_BYTELEN	3	/* max 3 bytes status = hub + 23 ports */
 
+#if defined(__linux__)
 static const char procbususb[] = "/proc/bus/usb";
+#endif
 static unsigned int verblevel = VERBLEVEL_DEFAULT;
 static int do_report_desc = 1;
 static const char * const encryption_type[] = {
@@ -3924,6 +3926,21 @@ error:
 	return status;
 }
 
+/* ---------------------------------------------------------------------- */
+
+#if defined(__APPLE__) || defined(__darwin__)
+void iousb_t (void) {
+	FILE *fp;
+	int status;
+	char path[PATH_MAX];
+	fp = popen("ioreg -p IOUSB", "r");
+
+	while (fgets(path, PATH_MAX, fp) != NULL)
+		printf("%s", path);
+
+	status = pclose(fp);
+}
+#endif
 
 /* ---------------------------------------------------------------------- */
 
@@ -4042,8 +4059,12 @@ int main(int argc, char *argv[])
 	if (treemode) {
 		/* treemode requires at least verblevel 1 */
 		verblevel += 1 - VERBLEVEL_DEFAULT;
+#if defined(__linux__)
 		status = lsusb_t();
 		names_exit();
+#elif defined(__APPLE__) || defined(__darwin__)
+		iousb_t();
+#endif
 		return status;
 	}
 
