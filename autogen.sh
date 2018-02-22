@@ -23,17 +23,30 @@ case "$CFLAGS" in
 esac
 
 libdir() {
-	echo $(cd $1/$(gcc -print-multi-os-directory); pwd)
+	if [[ $(uname) == "Darwin" ]];then
+		echo $(cd $1/$(gcc-7 -print-multi-os-directory); pwd)
+	elif [[ $(uname) == "Linux" ]];then
+		echo $(cd $1/$(gcc -print-multi-os-directory); pwd)
+	fi
 }
 
-args="--prefix=/usr \
---sysconfdir=/etc \
---sbindir=/sbin \
---libdir=$(libdir /usr/lib) \
---with-rootlibdir=$(libdir /lib) \
---libexecdir=/lib/udev \
---with-selinux \
---enable-gtk-doc"
+if [[ $(uname) == "Darwin" ]];then
+	args="--prefix=/usr \
+	--sysconfdir=/etc \
+	--bindir=/usr/sbin \
+	--sbindir=/usr/sbin \
+	--libdir=$(libdir /usr/lib) \
+	--enable-gtk-doc"
+elif [[ $(uname) == "Linux" ]];then
+	args="--prefix=/usr \
+	--sysconfdir=/etc \
+	--sbindir=/sbin \
+	--libdir=$(libdir /usr/lib) \
+	--with-rootlibdir=$(libdir /lib) \
+	--libexecdir=/lib/udev \
+	--with-selinux \
+	--enable-gtk-doc"
+fi
 
 export CFLAGS="$CFLAGS $MYCFLAGS"
 ./configure $args $@

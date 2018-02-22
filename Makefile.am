@@ -1,8 +1,13 @@
 SUBDIRS = \
 	usbhid-dump
 
+if DARWIN
+AM_LDFLAGS = \
+	-Wl
+else
 AM_LDFLAGS = \
 	-Wl,--as-needed
+endif
 
 data_DATA =
 
