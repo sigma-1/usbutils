@@ -45,7 +45,7 @@ man_MANS = \
 
 EXTRA_DIST = \
 	usb.ids \
-	update-usbids.sh.in \
+	update-usbids.in \
 	lsusb.8.in \
 	usb-devices.1.in \
 	usb-devices \
@@ -59,12 +59,12 @@ if HAVE_ZLIB
 data_DATA += usb.ids.gz
 endif
 
-sbin_SCRIPTS += update-usbids.sh
+sbin_SCRIPTS += update-usbids
 
 usb.ids.gz: $(srcdir)/usb.ids
 	gzip -c -9 $< > $@
 
-update-usbids.sh: $(srcdir)/update-usbids.sh.in
+update-usbids: $(srcdir)/update-usbids.in
 	sed 's|@usbids@|$(datadir)/usb.ids|g' $< >$@
 	chmod 755 $@
 endif
@@ -85,7 +85,7 @@ DISTCLEANFILES = \
 	usb.ids.gz \
 	lsusb.8 \
 	usb-devices.1 \
-	update-usbids.sh \
+	update-usbids \
 	usbutils.pc
 
 distclean-local:
